@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace GrammarDatabase.Entities
 {
-    public class Client
+    public class Client : Entity
     {
-        public int Id { get; set; }
         public string UserName { get; set; }
         public long ChatId { get; set; }
         public bool HasPrivilege { get; set; }

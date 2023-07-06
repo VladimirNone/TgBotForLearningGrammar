@@ -33,7 +33,7 @@ namespace GrammarDatabase.Migrations
 
                     b.HasIndex("SentencesId");
 
-                    b.ToTable("AnswerSentence");
+                    b.ToTable("AnswerSentence", (string)null);
                 });
 
             modelBuilder.Entity("GrammarDatabase.Entities.Answer", b =>
@@ -50,7 +50,7 @@ namespace GrammarDatabase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Answers");
+                    b.ToTable("Answers", (string)null);
                 });
 
             modelBuilder.Entity("GrammarDatabase.Entities.Client", b =>
@@ -80,7 +80,7 @@ namespace GrammarDatabase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clients");
+                    b.ToTable("Clients", (string)null);
                 });
 
             modelBuilder.Entity("GrammarDatabase.Entities.GrammarRule", b =>
@@ -101,7 +101,7 @@ namespace GrammarDatabase.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("GrammarRules");
+                    b.ToTable("GrammarRules", (string)null);
                 });
 
             modelBuilder.Entity("GrammarDatabase.Entities.Sentence", b =>
@@ -123,7 +123,7 @@ namespace GrammarDatabase.Migrations
 
                     b.HasIndex("GrammarRuleId");
 
-                    b.ToTable("Sentences");
+                    b.ToTable("Sentences", (string)null);
                 });
 
             modelBuilder.Entity("AnswerSentence", b =>

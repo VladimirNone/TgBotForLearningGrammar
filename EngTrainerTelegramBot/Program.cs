@@ -14,8 +14,11 @@ Console.WriteLine($"https://api.telegram.org/bot{telegramBotToken}/setWebhook?ur
 // Add services to the container.
 builder.Services.AddDbContext<GrammarDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("GrammarDbConnection")));
 builder.Services.AddSingleton<Bot>();
+builder.Services.AddDbInfrastructure();
 builder.Services.AddScoped<CommandDeterminer>();
+
 builder.Services.AddControllers().AddNewtonsoftJson();
+
 
 var app = builder.Build();
 

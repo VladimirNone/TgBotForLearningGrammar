@@ -1,7 +1,8 @@
-﻿
-using GrammarDatabase.Entities;
-using TelegramInfrastructure.Commands;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+﻿using GrammarDatabase.Entities;
+using Telegram.Bot.Types;
+using TelegramInfrastructure.Implementations;
+using TelegramInfrastructure.Implementations.Commands;
+using TelegramInfrastructure.Interfaces;
 
 namespace TelegramInfrastructure
 {
@@ -9,43 +10,62 @@ namespace TelegramInfrastructure
     {
         public List<Command> Commands { get; set; }
         private Command _currentCommand { get; set; }
-        private string _clientInput { get; set; }
+        private Message? _clientMessage { get; set; }
         private Client _client { get; set; }
         private Bot _tgBot { get; set; }
+        private IUnitOfWork _unitOfWork{ get; set; }
 
-        public CommandDeterminer(Bot bot)
+        public CommandDeterminer(Bot bot, IUnitOfWork unitOfWork)
         {
             _tgBot = bot;
+            _unitOfWork = unitOfWork;
+
             Commands = new List<Command>(){ 
-                new StartCommand(bot),
-                new RepeatCommand(bot),
-                new SimpleAnswerCommand(bot),
+                new StartCommand(bot, unitOfWork),
+                new RepeatCommand(bot, unitOfWork),
+                new SimpleAnswerCommand(bot, unitOfWork),
             };
         }
 
-        public void DetermineCommand(Client client, string userMessage)
+        public void DetermineCommand(Client client, Message? userMessage)
         {
             _client = client;
-            _clientInput = userMessage;
-            
+            _clientMessage = userMessage;
+            var clientInput = userMessage.Text;
 
-            /*if (string.IsNullOrEmpty(userMessage) || !userMessage.StartsWith('/'))
+
+            if (string.IsNullOrEmpty(clientInput) || !clientInput.StartsWith('/'))
             {
-                _currentCommand = Commands.Single(h=>h.CommandName == client.NameLastCommand);
+                _currentCommand = Commands.Single(h => h.CommandName == client.NameLastCommand);
             }
 
-            var command = Commands.SingleOrDefault(h => h.CommandName == client.NameLastCommand);
-            _currentCommand = command is not null ? command : Commands.Single(h => h.CommandName == client.NameLastCommand);*/
+            var command = Commands.SingleOrDefault(h => h.CommandName == clientInput);
+            _currentCommand = command is not null ? command : Commands.Single(h => h.CommandName == client.NameLastCommand);
 
         }
 
-        public void ExecuteCommand()
+        public async Task ExecuteCommand()
         {
-            _currentCommand = new SimpleAnswerCommand(_tgBot);
-            _currentCommand.Execute(_client, _clientInput);
-            _client.NameLastCommand = _currentCommand.CommandName;
+            try
+            {
+                await _currentCommand.Execute(_client, _clientMessage);
 
-            //update client in db
+                if (_client.Id == 0)
+                {
+                    _client.NameLastCommand = _currentCommand.CommandName;
+                }
+                else
+                {
+                    var clientFromDb = await _unitOfWork.GetRepository<Client>().GetEntityByPropertyAsync(h => h.ChatId == _client.ChatId);
+                    clientFromDb.NameLastCommand = _currentCommand.CommandName;
+                }
+                await _unitOfWork.Commit();
+
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.Rollback();
+            }
         }
 
     }
