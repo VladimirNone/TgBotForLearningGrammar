@@ -2,20 +2,25 @@
 
 using GrammarDatabase;
 using Microsoft.EntityFrameworkCore;
+using Telegram.Bot;
 using TelegramInfrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var telegramBotToken = builder.Configuration["TelegramBot:TelegramBotToken"];
-var serverUrl = builder.Configuration["TelegramBot:ServerUrl"]; ;
+var serverUrl = builder.Configuration["TelegramBot:ServerUrl"];
 Console.WriteLine($"https://api.telegram.org/bot{telegramBotToken}/setWebhook?url={serverUrl}");
 
 // Add services to the container.
 builder.Services.AddDbContext<GrammarDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("GrammarDbConnection")));
 builder.Services.AddSingleton<Bot>();
+builder.Services.AddScoped<CommandDeterminer>();
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 var app = builder.Build();
+
+/*var tgBot = app.Services.GetRequiredService<Bot>();
+await tgBot.BotClient.SetWebhookAsync(serverUrl);*/
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

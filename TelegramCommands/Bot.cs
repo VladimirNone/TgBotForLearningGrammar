@@ -6,18 +6,13 @@ namespace TelegramInfrastructure
 {
     public class Bot
     {
-        private TelegramBotClient botClient;
+        public TelegramBotClient BotClient { get; private set; }
         private string TelegramToken;
 
         public Bot(IConfiguration config)
         {
             TelegramToken = config["TelegramBot:TelegramBotToken"];
-        }
-
-        public TelegramBotClient GetTelegramBotClient()
-        {
-            botClient ??= new TelegramBotClient(TelegramToken);
-            return botClient;
+            BotClient = new TelegramBotClient(TelegramToken);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace GrammarDatabase
         public DbSet<Answer> Answers { get; set; }
         public DbSet<Sentence> Sentences { get; set; }
         public DbSet<GrammarRule> GrammarRules { get; set; }
+        public DbSet<Client> Clients { get; set; }
 
         public GrammarDbContext(DbContextOptions<GrammarDbContext> options)
             : base(options)

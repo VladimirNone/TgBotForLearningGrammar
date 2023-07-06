@@ -1,41 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using GrammarDatabase.Entities;
+using TelegramInfrastructure.Commands;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TelegramInfrastructure
 {
     public class CommandDeterminer
     {
-        public Dictionary<string, Command> Commands { get; set; }
-        private Command LastUserCommand { get; set; } = new SimpleAnswerCommand();
+        public List<Command> Commands { get; set; }
+        private Command _currentCommand { get; set; }
+        private string _clientInput { get; set; }
+        private Client _client { get; set; }
+        private Bot _tgBot { get; set; }
 
-        public CommandDeterminer()
+        public CommandDeterminer(Bot bot)
         {
-            Commands = new Dictionary<string, Command>
-            {
-                { "/repeat", new RepeatCommand() }
+            _tgBot = bot;
+            Commands = new List<Command>(){ 
+                new StartCommand(bot),
+                new RepeatCommand(bot),
+                new SimpleAnswerCommand(bot),
             };
         }
 
-        public Command DetermineCommand(string userMessage)
+        public void DetermineCommand(Client client, string userMessage)
         {
-            if(string.IsNullOrEmpty(userMessage) || !userMessage.StartsWith('/'))
-            {
-                return LastUserCommand;
-            }
+            _client = client;
+            _clientInput = userMessage;
             
-            if(Commands.TryGetValue(userMessage, out var command))
+
+            /*if (string.IsNullOrEmpty(userMessage) || !userMessage.StartsWith('/'))
             {
-                LastUserCommand = command;
-                return command;
-            }
-            else
-            {
-                return LastUserCommand;
+                _currentCommand = Commands.Single(h=>h.CommandName == client.NameLastCommand);
             }
 
+            var command = Commands.SingleOrDefault(h => h.CommandName == client.NameLastCommand);
+            _currentCommand = command is not null ? command : Commands.Single(h => h.CommandName == client.NameLastCommand);*/
+
+        }
+
+        public void ExecuteCommand()
+        {
+            _currentCommand = new SimpleAnswerCommand(_tgBot);
+            _currentCommand.Execute(_client, _clientInput);
+            _client.NameLastCommand = _currentCommand.CommandName;
+
+            //update client in db
         }
 
     }
