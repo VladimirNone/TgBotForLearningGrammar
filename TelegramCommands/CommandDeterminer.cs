@@ -22,7 +22,7 @@ namespace TelegramInfrastructure
 
             Commands = new List<Command>(){ 
                 new StartCommand(bot, unitOfWork),
-                new RepeatCommand(bot, unitOfWork),
+                new TrainGrammarCommand(bot, unitOfWork),
                 new SimpleAnswerCommand(bot, unitOfWork),
             };
         }
@@ -36,11 +36,11 @@ namespace TelegramInfrastructure
 
             if (string.IsNullOrEmpty(clientInput) || !clientInput.StartsWith('/'))
             {
-                _currentCommand = Commands.Single(h => h.CommandName == client.NameLastCommand);
+                _currentCommand = Commands.Single(h => h.CommandName == client.NameLastCommand.Split()[0]);
             }
 
             var command = Commands.SingleOrDefault(h => h.CommandName == clientInput);
-            _currentCommand = command is not null ? command : Commands.Single(h => h.CommandName == client.NameLastCommand);
+            _currentCommand = command is not null ? command : Commands.Single(h => h.CommandName == client.NameLastCommand.Split()[0]);
 
         }
 
@@ -50,15 +50,21 @@ namespace TelegramInfrastructure
             {
                 await _currentCommand.Execute(_client, _clientMessage);
 
-                if (_client.Id == 0)
-                {
-                    _client.NameLastCommand = _currentCommand.CommandName;
-                }
-                else
-                {
-                    var clientFromDb = await _unitOfWork.GetRepository<Client>().GetEntityByPropertyAsync(h => h.ChatId == _client.ChatId);
-                    clientFromDb.NameLastCommand = _currentCommand.CommandName;
-                }
+                await _unitOfWork.Commit();
+
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.Rollback();
+            }
+        }
+
+        public async Task UndoCommand()
+        {
+            try
+            {
+                _currentCommand.Undo(_client);
+
                 await _unitOfWork.Commit();
 
             }

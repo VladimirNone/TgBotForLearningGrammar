@@ -22,7 +22,7 @@ namespace TelegramInfrastructure.Implementations.Commands
             await TelegramBot.BotClient.SendTextMessageAsync(client.ChatId, "SimpleAnswerCommand answered");
         }
 
-        public override void Undo()
+        public override void Undo(Client client)
         {
             throw new NotImplementedException();
         }

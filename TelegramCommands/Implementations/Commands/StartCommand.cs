@@ -25,10 +25,11 @@ namespace TelegramInfrastructure.Implementations.Commands
                 await UnitOfWork.GetRepository<Client>().AddEntityAsync(client);
             }
 
-            await TelegramBot.BotClient.SendTextMessageAsync(client.ChatId, $"Здравствуй {client.UserName}! Тебя приветствует бот, обучающий грамматике английского языка!");
+            await TelegramBot.BotClient.SendTextMessageAsync(client.ChatId, $"Здравствуйте {client.UserName}! Вас приветствует бот, обучающий грамматике английского языка! Для начала тренироваки нажми на /startTrainGrammar");
+            ChangeLastClientCommand(client, CommandName);
         }
 
-        public override void Undo()
+        public override void Undo(Client client)
         {
             throw new NotImplementedException();
         }

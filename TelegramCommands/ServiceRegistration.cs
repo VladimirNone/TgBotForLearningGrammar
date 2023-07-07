@@ -14,7 +14,7 @@ namespace TelegramInfrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // This is the registration for custom repository class
-            services.AddTransient<IGeneralRepository<Client>, SentenceRepository>();
+            services.AddTransient<IGeneralRepository<Sentence>, SentenceRepository>();
         }
     }
 }

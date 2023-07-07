@@ -10,7 +10,10 @@ namespace GrammarDatabase.Entities
     {
         public string SentenceText { get; set; }
 
-        public List<Answer> Answers { get; set; }
+        public int GrammarRuleId { get; set; }
         public GrammarRule GrammarRule { get; set; }
+
+
+        public List<Answer> Answers { get; set; }
     }
 }

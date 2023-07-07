@@ -8,7 +8,7 @@ namespace GrammarDatabase.Entities
 {
     public class Client : Entity
     {
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
         public long ChatId { get; set; }
         public bool HasPrivilege { get; set; }
         public bool IsAdmin { get; set; }

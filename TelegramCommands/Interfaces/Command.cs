@@ -1,6 +1,7 @@
 ﻿using GrammarDatabase.Entities;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using TelegramInfrastructure.Implementations;
 
 namespace TelegramInfrastructure.Interfaces
 {
@@ -21,8 +22,13 @@ namespace TelegramInfrastructure.Interfaces
             TelegramBot = telegramBot;
         }
 
+        protected void ChangeLastClientCommand(Client client, string fullCommandName)
+        {
+            client.NameLastCommand = fullCommandName;
+        }
+
         public abstract Task Execute(Client client, Message? clientMessage);
-        public abstract void Undo();
+        public abstract void Undo(Client client);
 
     }
 }

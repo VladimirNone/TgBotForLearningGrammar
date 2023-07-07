@@ -27,7 +27,7 @@ namespace EngTrainerTelegramBot.Controllers
         {
             var client = new Client() { ChatId = update.Message.Chat.Id, UserName = update.Message.Chat.Username };
             var clientFromDb = await UnitOfWork.GetRepository<Client>().GetEntityByPropertyAsync(h => h.ChatId == client.ChatId);
-
+            
             CommandDeteminer.DetermineCommand(clientFromDb ?? client, update.Message);
 
             await CommandDeteminer.ExecuteCommand();

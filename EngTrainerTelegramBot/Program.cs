@@ -1,9 +1,13 @@
 
 
 using GrammarDatabase;
+using GrammarDatabase.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.X86;
+using System.Security.Cryptography;
 using Telegram.Bot;
 using TelegramInfrastructure;
+using TelegramInfrastructure.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +39,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapControllers();
