@@ -1,4 +1,5 @@
-﻿using GrammarDatabase.Entities;
+﻿using GrammarDatabase.DTOs;
+using GrammarDatabase.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace TelegramInfrastructure.Implementations.Commands
             CommandName = "/start";
         }
 
-        public override async Task Execute(Client client, Message? clientMessage)
+        public override async Task Execute(Client client, ClientMessage clientMessage)
         {
             if (client.Id == 0)
             {

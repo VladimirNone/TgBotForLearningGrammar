@@ -41,6 +41,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.Use(async (a, context) =>
+{
+    await context.Invoke();
+});
+
 app.MapControllers();
 
 app.Run();

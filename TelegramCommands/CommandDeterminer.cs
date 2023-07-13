@@ -1,4 +1,5 @@
-﻿using GrammarDatabase.Entities;
+﻿using GrammarDatabase.DTOs;
+using GrammarDatabase.Entities;
 using Telegram.Bot.Types;
 using TelegramInfrastructure.Implementations;
 using TelegramInfrastructure.Implementations.Commands;
@@ -10,7 +11,7 @@ namespace TelegramInfrastructure
     {
         public List<Command> Commands { get; set; }
         private Command _currentCommand { get; set; }
-        private Message? _clientMessage { get; set; }
+        private ClientMessage _clientMessage { get; set; }
         private Client _client { get; set; }
         private Bot _tgBot { get; set; }
         private IUnitOfWork _unitOfWork{ get; set; }
@@ -23,23 +24,23 @@ namespace TelegramInfrastructure
             Commands = new List<Command>(){ 
                 new StartCommand(bot, unitOfWork),
                 new TrainGrammarCommand(bot, unitOfWork),
-                new SimpleAnswerCommand(bot, unitOfWork),
+                new PreparationForTrainingCommand(bot, unitOfWork),
             };
         }
 
-        public void DetermineCommand(Client client, Message? userMessage)
+        public void DetermineCommand(Client client, ClientMessage userMessage)
         {
             _client = client;
             _clientMessage = userMessage;
-            var clientInput = userMessage.Text;
+            var clientInput = userMessage.Text.Split();
 
 
-            if (string.IsNullOrEmpty(clientInput) || !clientInput.StartsWith('/'))
+            if (clientInput.Length == 0 || !clientInput[0].StartsWith('/'))
             {
                 _currentCommand = Commands.Single(h => h.CommandName == client.NameLastCommand.Split()[0]);
             }
 
-            var command = Commands.SingleOrDefault(h => h.CommandName == clientInput);
+            var command = Commands.SingleOrDefault(h => h.CommandName == clientInput[0]);
             _currentCommand = command is not null ? command : Commands.Single(h => h.CommandName == client.NameLastCommand.Split()[0]);
 
         }

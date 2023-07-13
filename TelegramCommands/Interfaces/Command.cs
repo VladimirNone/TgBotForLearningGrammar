@@ -1,4 +1,5 @@
-﻿using GrammarDatabase.Entities;
+﻿using GrammarDatabase.DTOs;
+using GrammarDatabase.Entities;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramInfrastructure.Implementations;
@@ -27,7 +28,7 @@ namespace TelegramInfrastructure.Interfaces
             client.NameLastCommand = fullCommandName;
         }
 
-        public abstract Task Execute(Client client, Message? clientMessage);
+        public abstract Task Execute(Client client, ClientMessage clientMessage);
         public abstract void Undo(Client client);
 
     }

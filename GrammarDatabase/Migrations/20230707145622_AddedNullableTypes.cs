@@ -19,7 +19,7 @@ namespace GrammarDatabase.Migrations
                 oldType: "text");
 
             migrationBuilder.AlterColumn<string>(
-                name: "UserName",
+                name: "Username",
                 table: "Clients",
                 type: "text",
                 nullable: true,
@@ -41,7 +41,7 @@ namespace GrammarDatabase.Migrations
                 oldNullable: true);
 
             migrationBuilder.AlterColumn<string>(
-                name: "UserName",
+                name: "Username",
                 table: "Clients",
                 type: "text",
                 nullable: false,

@@ -23,10 +23,10 @@ namespace TelegramInfrastructure.Implementations.Repositories
             return sentence.Answers.Any(h=>h.AnswerText.ToLower() == clientAnswer.ToLower());
         }
 
-        public async Task<Sentence> GetRandomSentence()
+        public async Task<Sentence> GetRandomSentence(List<string> inRules)
         {
-            var random = new Random().Next(0, DbSet.Count() - 1);
-            return await DbSet.Skip(random).Take(1).FirstOrDefaultAsync();
+            var random = new Random().Next(0, DbSet.Include(h => h.GrammarRule).Where(h => inRules.Count == 0 || inRules.Contains(h.GrammarRule.CommandName)).Count() - 1);
+            return await DbSet.Where(h=> inRules.Count == 0 || inRules.Contains(h.GrammarRule.CommandName)).Skip(random).Take(1).FirstOrDefaultAsync();
         }
     }
 }

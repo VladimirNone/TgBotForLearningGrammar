@@ -9,6 +9,7 @@ namespace GrammarDatabase.Entities
     public class GrammarRule : Entity
     {
         public string Name { get; set; }
+        public string CommandName { get; set; }
         public string? UseCases { get; set; }
 
         public List<Sentence> Sentences { get; set; }

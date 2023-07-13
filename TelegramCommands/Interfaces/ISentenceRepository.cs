@@ -9,7 +9,7 @@ namespace TelegramInfrastructure.Interfaces
 {
     public interface ISentenceRepository : IGeneralRepository<Sentence>
     {
-        Task<Sentence> GetRandomSentence();
+        Task<Sentence> GetRandomSentence(List<string> exceptRules);
         Task<bool> CheckSentenceAnswer(int sentenceId, string clientAnswer);
     }
 }

@@ -1,4 +1,5 @@
-﻿using GrammarDatabase.Entities;
+﻿using GrammarDatabase.DTOs;
+using GrammarDatabase.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 using TelegramInfrastructure;
@@ -25,10 +26,20 @@ namespace EngTrainerTelegramBot.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Update update)
         {
-            var client = new Client() { ChatId = update.Message.Chat.Id, UserName = update.Message.Chat.Username };
+            ClientMessage message;
+            if (update.Type == Telegram.Bot.Types.Enums.UpdateType.Message)
+            {
+                message = new ClientMessage() { ChatId = update.Message.Chat.Id, Text = update.Message.Text, Username = update.Message.Chat.Username };
+            }
+            else //if (update.Type == Telegram.Bot.Types.Enums.UpdateType.CallbackQuery)
+            {
+                message = new ClientMessage() { ChatId = update.CallbackQuery.Message.Chat.Id, Text = update.CallbackQuery.Data, Username = update.CallbackQuery.Message.Chat.Username };
+            }
+
+            var client = new Client() { ChatId = message.ChatId, UserName = message.Username };
             var clientFromDb = await UnitOfWork.GetRepository<Client>().GetEntityByPropertyAsync(h => h.ChatId == client.ChatId);
-            
-            CommandDeteminer.DetermineCommand(clientFromDb ?? client, update.Message);
+
+            CommandDeteminer.DetermineCommand(clientFromDb ?? client, message);
 
             await CommandDeteminer.ExecuteCommand();
 

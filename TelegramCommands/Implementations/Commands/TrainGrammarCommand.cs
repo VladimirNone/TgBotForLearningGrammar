@@ -1,4 +1,5 @@
-﻿using GrammarDatabase.Entities;
+﻿using GrammarDatabase.DTOs;
+using GrammarDatabase.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -25,12 +26,14 @@ namespace TelegramInfrastructure.Implementations.Commands
             CommandName = "/startTrainGrammar";
         }
 
-        public override async Task Execute(Client client, Message? clientMessage)
+        public override async Task Execute(Client client, ClientMessage clientMessage)
         {
             var sentenceRepo = (ISentenceRepository)UnitOfWork.GetRepository<Sentence>(true);
-            var randomSentence = await sentenceRepo.GetRandomSentence();
-            var commandNameWithParams = CommandName + " " + randomSentence.Id;
 
+            var commandNameWithParams = BuildCommandNameWithParams(client.NameLastCommand);
+            var randomSentence = await sentenceRepo.GetRandomSentence(commandNameWithParams.GetRange(1, commandNameWithParams.Count-1));
+            commandNameWithParams.Insert(1, randomSentence.Id.ToString());
+             
             if (client.NameLastCommand.StartsWith(CommandName))
             {
                 var splitedInfo = client.NameLastCommand.Split();
@@ -45,17 +48,27 @@ namespace TelegramInfrastructure.Implementations.Commands
                 {
                     await TelegramBot.BotClient.SendTextMessageAsync(client.ChatId, "Не правильный ответ(", replyToMessageId: previousBotMessageId);
                 }
-
-                var botMessage = await TelegramBot.BotClient.SendTextMessageAsync(client.ChatId, randomSentence.SentenceText);
-                commandNameWithParams += " " + botMessage.MessageId;
             }
-            else
+
+            var botMessage = await TelegramBot.BotClient.SendTextMessageAsync(client.ChatId, randomSentence.SentenceText);
+            commandNameWithParams.Insert(2, botMessage.MessageId.ToString());
+
+            ChangeLastClientCommand(client, string.Join(" ", commandNameWithParams));
+        }
+
+        private List<string> BuildCommandNameWithParams(string lastClientCommand)
+        {
+            var resList = new List<string>() { CommandName };
+            if(lastClientCommand.StartsWith("/prepareForTraining"))
             {
-                var botMessage = await TelegramBot.BotClient.SendTextMessageAsync(client.ChatId, randomSentence.SentenceText);
-                commandNameWithParams += " " + botMessage.MessageId;
+                resList.AddRange(lastClientCommand.Split()[1..]);
+            }
+            else if (lastClientCommand.StartsWith(CommandName))
+            {
+                resList.AddRange(lastClientCommand.Split()[3..].ToList());
             }
 
-            ChangeLastClientCommand(client, commandNameWithParams);
+            return resList;
         }
 
         public override void Undo(Client client)
